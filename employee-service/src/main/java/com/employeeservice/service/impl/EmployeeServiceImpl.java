@@ -1,9 +1,12 @@
 package com.employeeservice.service.impl;
 
+import com.employeeservice.dto.APIResponseDto;
+import com.employeeservice.dto.DepartmentDto;
 import com.employeeservice.dto.EmployeeDto;
 import com.employeeservice.entity.Employee;
 import com.employeeservice.mapper.EmployeeMapper;
 import com.employeeservice.repository.EmployeeRepository;
+import com.employeeservice.service.APIClient;
 import com.employeeservice.service.EmployeeService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private EmployeeRepository employeeRepository;
     private EmployeeMapper employeeMapper;
+    private APIClient apiClient;
 
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
@@ -25,9 +29,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto getEmployeeById(Long id) {
+    public APIResponseDto getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id).get();
-        return employeeMapper.mapToDto(employee);
+        EmployeeDto employeeDto = employeeMapper.mapToDto(employee);
+        DepartmentDto departmentDto = apiClient.getDepartmentByCode(employee.getDepartmentCode());
+        APIResponseDto apiResponseDto = new APIResponseDto();
+        apiResponseDto.setEmployeeDto(employeeDto);
+        apiResponseDto.setDepartmentDto(departmentDto);
+        return apiResponseDto;
     }
 
     @Override
